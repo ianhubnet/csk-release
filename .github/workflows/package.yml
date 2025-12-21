@@ -42,16 +42,25 @@ jobs:
       # 3. Prepare ZIP contents
       - name: 3️⃣ Prepare ZIP contents
         run: |
-          if [ ! -d "src" ]; then
-            echo "::error::src not found"
-            exit 1
-          fi
-
           mkdir "${{ steps.vars.outputs.name }}"
-          cp -r src "${{ steps.vars.outputs.name }}/"
 
-          if [ -d "assets" ]; then
-            cp -r assets "${{ steps.vars.outputs.name }}/"
+          if [ "${{ inputs.type }}" = "language" ]; then
+            LANG_DIR="language/${{ steps.vars.outputs.name }}"
+            if [ ! -d "$LANG_DIR" ]; then
+              echo "::error::$LANG_DIR not found"
+              exit 1
+            fi
+            cp -r "$LANG_DIR"/* "${{ steps.vars.outputs.name }}/"
+          else
+            if [ ! -d "src" ]; then
+              echo "::error::src not found"
+              exit 1
+            fi
+            cp -r src "${{ steps.vars.outputs.name }}/"
+
+            if [ -d "assets" ]; then
+              cp -r assets "${{ steps.vars.outputs.name }}/"
+            fi
           fi
 
           for f in README.md LICENSE.md; do
