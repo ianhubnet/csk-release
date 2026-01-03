@@ -39,20 +39,14 @@ jobs:
       # 3. Prepare ZIP contents
       - name: 3️⃣ Prepare ZIP contents
         run: |
-          mkdir "${{ steps.vars.outputs.name }}"
-          rsync -av --exclude='.git' \
-                    --exclude='.github' \
-                    --exclude='.gitdocs' \
-                    --exclude='.dev' \
-                    --exclude='.gitignore' \
-                    --exclude='.gitattributes' \
-                    --exclude='.editorconfig' \
-                    --exclude='.gitmodules' \
-                    --exclude='CITATION.cff' \
-                    --exclude='project.yml' \
-                    --exclude='*.todolist' \
-                    --exclude="${{ steps.vars.outputs.name }}" \
-                    ./ "${{ steps.vars.outputs.name }}"
+          mkdir -p "${{ steps.vars.outputs.name }}"
+
+          # Copy ONLY application contents
+          rsync -av application/ "${{ steps.vars.outputs.name }}/"
+
+          # Copy metadata files if present
+          [ -f LICENSE.md ] && cp LICENSE.md "${{ steps.vars.outputs.name }}/"
+          [ -f README.md ] && cp README.md "${{ steps.vars.outputs.name }}/"
 
       # 4. Create ZIP archive
       - name: 4️⃣ Create ZIP archive
